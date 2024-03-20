@@ -25,6 +25,10 @@ func ConfigJWT(secret string) echo.MiddlewareFunc {
 			return new(jwtCustomClaims)
 		},
 		SigningKey: []byte(secret),
+		SuccessHandler: func(c echo.Context) {
+			accountsID := DecodeToken(c)
+			c.Set("accountsID", accountsID)
+		},
 	}
 
 	return echojwt.WithConfig(config)

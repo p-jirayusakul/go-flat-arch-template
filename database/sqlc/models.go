@@ -15,3 +15,15 @@ type Accounts struct {
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
+
+type Addresses struct {
+	ID            string             `json:"id"`
+	StreetAddress pgtype.Text        `json:"street_address"`
+	City          string             `json:"city"`
+	StateProvince string             `json:"state_province"`
+	PostalCode    string             `json:"postal_code"`
+	Country       string             `json:"country"`
+	CreatedAt     pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt     pgtype.Timestamptz `json:"updated_at"`
+	AccountsID    pgtype.Text        `json:"accounts_id"`
+}

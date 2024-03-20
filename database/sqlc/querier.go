@@ -6,16 +6,26 @@ package database
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Querier interface {
 	CreateAccount(ctx context.Context, arg CreateAccountParams) (string, error)
+	CreateAddresses(ctx context.Context, arg CreateAddressesParams) (string, error)
 	DeleteAccount(ctx context.Context, id string) error
+	DeleteAddressesById(ctx context.Context, id string) error
 	GetAccountByEmail(ctx context.Context, email string) (GetAccountByEmailRow, error)
 	GetAccountByID(ctx context.Context, id string) (GetAccountByIDRow, error)
+	GetAddressById(ctx context.Context, id string) (GetAddressByIdRow, error)
+	IsAccountAlreadyExists(ctx context.Context, id string) (bool, error)
+	IsAddressesAlreadyExists(ctx context.Context, id string) (bool, error)
 	IsEmailAlreadyExists(ctx context.Context, email string) (bool, error)
 	ListAccounts(ctx context.Context) ([]ListAccountsRow, error)
+	ListAddresses(ctx context.Context) ([]ListAddressesRow, error)
+	ListAddressesByAccountId(ctx context.Context, accountsID pgtype.Text) ([]ListAddressesByAccountIdRow, error)
 	UpdateAccountPasswordByEmail(ctx context.Context, arg UpdateAccountPasswordByEmailParams) error
+	UpdateAddressById(ctx context.Context, arg UpdateAddressByIdParams) error
 }
 
 var _ Querier = (*Queries)(nil)

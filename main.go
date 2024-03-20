@@ -31,12 +31,15 @@ func main() {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 
+	// init validator
 	app.Validator = middleware.NewCustomValidator()
 	app.Use(middleware.ErrorHandler)
 
+	// init log
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	app.Use(middleware.LogHandler(logger))
 
+	// add all plug to handler
 	handlers.NewHandler(app, &config, store)
 	app.Logger.Fatal(app.Start(":" + config.API_PORT))
 }

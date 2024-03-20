@@ -22,3 +22,10 @@ SELECT CASE
     WHEN count(email) > 0 THEN true
     ELSE false
 END AS "isAlreadyExists" FROM public.accounts WHERE email = $1 LIMIT 1;
+DELETE FROM public.accounts WHERE id = $1;
+
+-- name: IsAccountAlreadyExists :one
+SELECT CASE
+    WHEN count(id) > 0 THEN true
+    ELSE false
+END AS "isAlreadyExists" FROM public.accounts WHERE id = $1 LIMIT 1;

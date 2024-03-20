@@ -69,6 +69,20 @@ func (q *Queries) GetAccountByID(ctx context.Context, id string) (GetAccountByID
 	return i, err
 }
 
+const isAccountAlreadyExists = `-- name: IsAccountAlreadyExists :one
+SELECT CASE
+    WHEN count(id) > 0 THEN true
+    ELSE false
+END AS "isAlreadyExists" FROM public.accounts WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) IsAccountAlreadyExists(ctx context.Context, id string) (bool, error) {
+	row := q.db.QueryRow(ctx, isAccountAlreadyExists, id)
+	var isAlreadyExists bool
+	err := row.Scan(&isAlreadyExists)
+	return isAlreadyExists, err
+}
+
 const isEmailAlreadyExists = `-- name: IsEmailAlreadyExists :one
 SELECT CASE
     WHEN count(email) > 0 THEN true
