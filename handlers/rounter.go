@@ -6,17 +6,17 @@ import (
 	"github.com/labstack/echo/v4"
 	database "github.com/p-jirayusakul/go-flat-arch-template/database/sqlc"
 	"github.com/p-jirayusakul/go-flat-arch-template/middleware"
-	config "github.com/p-jirayusakul/go-flat-arch-template/utils"
+	"github.com/p-jirayusakul/go-flat-arch-template/utils"
 )
 
 type ServerHttpHandler struct {
-	cfg   *config.Config
+	cfg   *utils.Config
 	store database.Store
 }
 
 func NewHandler(
 	app *echo.Echo,
-	cfg *config.Config,
+	cfg *utils.Config,
 	store database.Store,
 ) *ServerHttpHandler {
 
@@ -50,7 +50,7 @@ func (s *ServerHttpHandler) GetTokenID(c echo.Context) error {
 	}
 
 	if !isAlreadyExists {
-		return fmt.Errorf("accounts id is invalid")
+		return fmt.Errorf(utils.ErrAccountIsInvalid.Error())
 	}
 
 	return nil
