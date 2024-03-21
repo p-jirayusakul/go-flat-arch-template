@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/labstack/echo/v4"
 	database "github.com/p-jirayusakul/go-flat-arch-template/database/sqlc"
 	"github.com/p-jirayusakul/go-flat-arch-template/handlers/request"
@@ -37,7 +36,7 @@ func (s *ServerHttpHandler) CreateAddresses(c echo.Context) (err error) {
 		StateProvince: body.Province,
 		PostalCode:    body.PostalCode,
 		Country:       body.Country,
-		AccountsID:    pgtype.Text{String: c.Get("accountsID").(string), Valid: true},
+		AccountsID:    c.Get("accountsID").(string),
 	}
 
 	_, err = s.store.CreateAddresses(ctx, arg)
@@ -60,7 +59,7 @@ func (s *ServerHttpHandler) ListAddresses(c echo.Context) (err error) {
 		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	}
 
-	result, err := s.store.ListAddressesByAccountId(ctx, pgtype.Text{String: c.Get("accountsID").(string), Valid: true})
+	result, err := s.store.ListAddressesByAccountId(ctx, c.Get("accountsID").(string))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -90,7 +89,10 @@ func (s *ServerHttpHandler) UpdateAddresses(c echo.Context) (err error) {
 		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	}
 
-	isAlreadyExists, err := s.store.IsAddressesAlreadyExists(ctx, body.ID)
+	isAlreadyExists, err := s.store.IsAddressesAlreadyExists(ctx, database.IsAddressesAlreadyExistsParams{
+		ID:         body.ID,
+		AccountsID: c.Get("accountsID").(string),
+	})
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -106,7 +108,7 @@ func (s *ServerHttpHandler) UpdateAddresses(c echo.Context) (err error) {
 		StateProvince: body.Province,
 		PostalCode:    body.PostalCode,
 		Country:       body.Country,
-		AccountsID:    pgtype.Text{String: c.Get("accountsID").(string), Valid: true},
+		AccountsID:    c.Get("accountsID").(string),
 	}
 
 	err = s.store.UpdateAddressById(ctx, arg)
@@ -140,7 +142,11 @@ func (s *ServerHttpHandler) DeleteAddresses(c echo.Context) (err error) {
 		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	}
 
-	isAlreadyExists, err := s.store.IsAddressesAlreadyExists(ctx, body.ID)
+	isAlreadyExists, err := s.store.IsAddressesAlreadyExists(ctx, database.IsAddressesAlreadyExistsParams{
+		ID:         body.ID,
+		AccountsID: c.Get("accountsID").(string),
+	})
+
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

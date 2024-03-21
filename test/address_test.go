@@ -38,7 +38,7 @@ func TestCreateAddress(t *testing.T) {
 					StateProvince: body.Province,
 					PostalCode:    body.PostalCode,
 					Country:       body.Country,
-					AccountsID:    pgtype.Text{String: uid, Valid: true},
+					AccountsID:    uid,
 				}).Times(1).Return("uuid", nil)
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
@@ -142,7 +142,7 @@ func TestListAddresses(t *testing.T) {
 			buildStubs: func(store *mockup.MockStore) {
 				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
 
-				store.EXPECT().ListAddressesByAccountId(gomock.Any(), pgtype.Text{String: uid, Valid: true}).Times(1).Return([]database.ListAddressesByAccountIdRow{
+				store.EXPECT().ListAddressesByAccountId(gomock.Any(), uid).Times(1).Return([]database.ListAddressesByAccountIdRow{
 					{
 						ID:            "942524af-9df4-425a-8abc-77e940ef8fcb",
 						StreetAddress: pgtype.Text{String: "address", Valid: true},
@@ -213,7 +213,10 @@ func TestUpdateAddresses(t *testing.T) {
 			buildStubs: func(store *mockup.MockStore, body request.UpdateAddressesRequest) {
 				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
 
-				store.EXPECT().IsAddressesAlreadyExists(gomock.Any(), addressesID).Times(1).Return(true, nil)
+				store.EXPECT().IsAddressesAlreadyExists(gomock.Any(), database.IsAddressesAlreadyExistsParams{
+					ID:         addressesID,
+					AccountsID: uid,
+				}).Times(1).Return(true, nil)
 				store.EXPECT().UpdateAddressById(gomock.Any(), database.UpdateAddressByIdParams{
 					ID:            addressesID,
 					StreetAddress: body.Address,
@@ -221,7 +224,7 @@ func TestUpdateAddresses(t *testing.T) {
 					StateProvince: body.Province,
 					PostalCode:    body.PostalCode,
 					Country:       body.Country,
-					AccountsID:    pgtype.Text{String: uid, Valid: true},
+					AccountsID:    uid,
 				}).Times(1).Return(nil)
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
@@ -235,7 +238,10 @@ func TestUpdateAddresses(t *testing.T) {
 			buildStubs: func(store *mockup.MockStore, body request.UpdateAddressesRequest) {
 				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
 
-				store.EXPECT().IsAddressesAlreadyExists(gomock.Any(), addressesID).Times(1).Return(false, nil)
+				store.EXPECT().IsAddressesAlreadyExists(gomock.Any(), database.IsAddressesAlreadyExistsParams{
+					ID:         addressesID,
+					AccountsID: uid,
+				}).Times(1).Return(false, nil)
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
@@ -335,7 +341,6 @@ func TestDeleteAddresses(t *testing.T) {
 	addressesID := "e2109e75-1d9d-48fb-9e68-310d4720b015"
 	testCases := []struct {
 		name          string
-		body          string
 		buildStubs    func(store *mockup.MockStore)
 		checkResponse func(t *testing.T, status int, err error)
 	}{
@@ -344,7 +349,10 @@ func TestDeleteAddresses(t *testing.T) {
 			buildStubs: func(store *mockup.MockStore) {
 				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
 
-				store.EXPECT().IsAddressesAlreadyExists(gomock.Any(), addressesID).Times(1).Return(true, nil)
+				store.EXPECT().IsAddressesAlreadyExists(gomock.Any(), database.IsAddressesAlreadyExistsParams{
+					ID:         addressesID,
+					AccountsID: uid,
+				}).Times(1).Return(true, nil)
 				store.EXPECT().DeleteAddressesById(gomock.Any(), addressesID).Times(1).Return(nil)
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
@@ -357,7 +365,10 @@ func TestDeleteAddresses(t *testing.T) {
 			buildStubs: func(store *mockup.MockStore) {
 				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
 
-				store.EXPECT().IsAddressesAlreadyExists(gomock.Any(), addressesID).Times(1).Return(false, nil)
+				store.EXPECT().IsAddressesAlreadyExists(gomock.Any(), database.IsAddressesAlreadyExistsParams{
+					ID:         addressesID,
+					AccountsID: uid,
+				}).Times(1).Return(false, nil)
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
@@ -381,7 +392,7 @@ func TestDeleteAddresses(t *testing.T) {
 			app.Validator = middleware.NewCustomValidator()
 			app.Use(middleware.ErrorHandler)
 
-			req := httptest.NewRequest(http.MethodDelete, "/api/v1/profile/addresses", strings.NewReader(tc.body))
+			req := httptest.NewRequest(http.MethodDelete, "/api/v1/profile/addresses", nil)
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
 			rec := httptest.NewRecorder()

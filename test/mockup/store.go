@@ -13,7 +13,6 @@ import (
 	context "context"
 	reflect "reflect"
 
-	pgtype "github.com/jackc/pgx/v5/pgtype"
 	database "github.com/p-jirayusakul/go-flat-arch-template/database/sqlc"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -160,7 +159,7 @@ func (mr *MockStoreMockRecorder) IsAccountAlreadyExists(arg0, arg1 any) *gomock.
 }
 
 // IsAddressesAlreadyExists mocks base method.
-func (m *MockStore) IsAddressesAlreadyExists(arg0 context.Context, arg1 string) (bool, error) {
+func (m *MockStore) IsAddressesAlreadyExists(arg0 context.Context, arg1 database.IsAddressesAlreadyExistsParams) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IsAddressesAlreadyExists", arg0, arg1)
 	ret0, _ := ret[0].(bool)
@@ -220,7 +219,7 @@ func (mr *MockStoreMockRecorder) ListAddresses(arg0 any) *gomock.Call {
 }
 
 // ListAddressesByAccountId mocks base method.
-func (m *MockStore) ListAddressesByAccountId(arg0 context.Context, arg1 pgtype.Text) ([]database.ListAddressesByAccountIdRow, error) {
+func (m *MockStore) ListAddressesByAccountId(arg0 context.Context, arg1 string) ([]database.ListAddressesByAccountIdRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListAddressesByAccountId", arg0, arg1)
 	ret0, _ := ret[0].([]database.ListAddressesByAccountIdRow)

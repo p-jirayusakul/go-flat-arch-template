@@ -13,7 +13,7 @@ import (
 
 const createAddresses = `-- name: CreateAddresses :one
 INSERT INTO public.addresses(street_address, city, state_province, postal_code, country, accounts_id)
-VALUES ($1, $2, $3, $4, $5, $6) RETURNING id
+VALUES ($1, $2, $3, $4, $5, $6::text) RETURNING id
 `
 
 type CreateAddressesParams struct {
@@ -22,7 +22,7 @@ type CreateAddressesParams struct {
 	StateProvince string      `json:"state_province"`
 	PostalCode    string      `json:"postal_code"`
 	Country       string      `json:"country"`
-	AccountsID    pgtype.Text `json:"accounts_id"`
+	AccountsID    string      `json:"accounts_id"`
 }
 
 func (q *Queries) CreateAddresses(ctx context.Context, arg CreateAddressesParams) (string, error) {
@@ -79,11 +79,16 @@ const isAddressesAlreadyExists = `-- name: IsAddressesAlreadyExists :one
 SELECT CASE
     WHEN count(id) > 0 THEN true
     ELSE false
-END AS "isAlreadyExists" FROM public.addresses WHERE id = $1 LIMIT 1
+END AS "isAlreadyExists" FROM public.addresses WHERE id = $1 AND accounts_id = $2::text LIMIT 1
 `
 
-func (q *Queries) IsAddressesAlreadyExists(ctx context.Context, id string) (bool, error) {
-	row := q.db.QueryRow(ctx, isAddressesAlreadyExists, id)
+type IsAddressesAlreadyExistsParams struct {
+	ID         string `json:"id"`
+	AccountsID string `json:"accounts_id"`
+}
+
+func (q *Queries) IsAddressesAlreadyExists(ctx context.Context, arg IsAddressesAlreadyExistsParams) (bool, error) {
+	row := q.db.QueryRow(ctx, isAddressesAlreadyExists, arg.ID, arg.AccountsID)
 	var isAlreadyExists bool
 	err := row.Scan(&isAlreadyExists)
 	return isAlreadyExists, err
@@ -130,7 +135,7 @@ func (q *Queries) ListAddresses(ctx context.Context) ([]ListAddressesRow, error)
 }
 
 const listAddressesByAccountId = `-- name: ListAddressesByAccountId :many
-SELECT id, street_address as "streetAddress", city, state_province as "stateProvince", postal_code as "postalCode", country FROM public.addresses WHERE accounts_id = $1
+SELECT id, street_address as "streetAddress", city, state_province as "stateProvince", postal_code as "postalCode", country FROM public.addresses WHERE accounts_id = $1::text
 `
 
 type ListAddressesByAccountIdRow struct {
@@ -142,7 +147,7 @@ type ListAddressesByAccountIdRow struct {
 	Country       string      `json:"country"`
 }
 
-func (q *Queries) ListAddressesByAccountId(ctx context.Context, accountsID pgtype.Text) ([]ListAddressesByAccountIdRow, error) {
+func (q *Queries) ListAddressesByAccountId(ctx context.Context, accountsID string) ([]ListAddressesByAccountIdRow, error) {
 	rows, err := q.db.Query(ctx, listAddressesByAccountId, accountsID)
 	if err != nil {
 		return nil, err
@@ -171,29 +176,29 @@ func (q *Queries) ListAddressesByAccountId(ctx context.Context, accountsID pgtyp
 
 const updateAddressById = `-- name: UpdateAddressById :exec
 UPDATE public.addresses
-	SET updated_at = NOW(), street_address=$3, city=$4, state_province=$5, postal_code=$6, country=$7 
-WHERE id = $1 AND accounts_id = $2
+	SET updated_at = NOW(), street_address=$2, city=$3, state_province=$4, postal_code=$5, country=$6 
+WHERE id = $1 AND accounts_id = $7::text
 `
 
 type UpdateAddressByIdParams struct {
 	ID            string      `json:"id"`
-	AccountsID    pgtype.Text `json:"accounts_id"`
 	StreetAddress pgtype.Text `json:"street_address"`
 	City          string      `json:"city"`
 	StateProvince string      `json:"state_province"`
 	PostalCode    string      `json:"postal_code"`
 	Country       string      `json:"country"`
+	AccountsID    string      `json:"accounts_id"`
 }
 
 func (q *Queries) UpdateAddressById(ctx context.Context, arg UpdateAddressByIdParams) error {
 	_, err := q.db.Exec(ctx, updateAddressById,
 		arg.ID,
-		arg.AccountsID,
 		arg.StreetAddress,
 		arg.City,
 		arg.StateProvince,
 		arg.PostalCode,
 		arg.Country,
+		arg.AccountsID,
 	)
 	return err
 }

@@ -6,8 +6,6 @@ package database
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Querier interface {
@@ -19,11 +17,11 @@ type Querier interface {
 	GetAccountByID(ctx context.Context, id string) (GetAccountByIDRow, error)
 	GetAddressById(ctx context.Context, id string) (GetAddressByIdRow, error)
 	IsAccountAlreadyExists(ctx context.Context, id string) (bool, error)
-	IsAddressesAlreadyExists(ctx context.Context, id string) (bool, error)
+	IsAddressesAlreadyExists(ctx context.Context, arg IsAddressesAlreadyExistsParams) (bool, error)
 	IsEmailAlreadyExists(ctx context.Context, email string) (bool, error)
 	ListAccounts(ctx context.Context) ([]ListAccountsRow, error)
 	ListAddresses(ctx context.Context) ([]ListAddressesRow, error)
-	ListAddressesByAccountId(ctx context.Context, accountsID pgtype.Text) ([]ListAddressesByAccountIdRow, error)
+	ListAddressesByAccountId(ctx context.Context, accountsID string) ([]ListAddressesByAccountIdRow, error)
 	UpdateAccountPasswordByEmail(ctx context.Context, arg UpdateAccountPasswordByEmailParams) error
 	UpdateAddressById(ctx context.Context, arg UpdateAddressByIdParams) error
 }
