@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -71,7 +72,7 @@ func (s *ServerHttpHandler) Register(c echo.Context) (err error) {
 	// Test Call APIs External Project
 	resultAPIs, err := s.exApi.GetPosts()
 	if err != nil {
-		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
+		slog.Warn(err.Error())
 	}
 
 	fmt.Println("resultAPIs", resultAPIs)
