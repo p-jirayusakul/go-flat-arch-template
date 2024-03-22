@@ -15,6 +15,18 @@ import (
 	"github.com/p-jirayusakul/go-flat-arch-template/pkg/utils"
 )
 
+// Register
+// @Summary      Register By email and password
+// @Description  register
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param request body request.RegisterRequest true "body request"
+// @Success      201  {object}  utils.SuccessResponse
+// @Failure      400  {object}  utils.ErrorResponse
+// @Failure      404  {object}  utils.ErrorResponse
+// @Failure      500  {object}  utils.ErrorResponse
+// @Router       /api/v1/auth/register [post]
 func (s *ServerHttpHandler) Register(c echo.Context) (err error) {
 	ctx := context.Background()
 
@@ -61,6 +73,18 @@ func (s *ServerHttpHandler) Register(c echo.Context) (err error) {
 	return utils.RespondWithJSON(c, http.StatusCreated, message, payload)
 }
 
+// Login
+// @Summary      Login By email and password
+// @Description  register
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param request body request.LoginRequest true "body request"
+// @Success      200  {object}  utils.SuccessResponse.Data{data=response.LoginResponse}
+// @Failure      400  {object}  utils.ErrorResponse
+// @Failure      404  {object}  utils.ErrorResponse
+// @Failure      500  {object}  utils.ErrorResponse
+// @Router       /api/v1/auth/login [post]
 func (s *ServerHttpHandler) Login(c echo.Context) (err error) {
 	ctx := context.Background()
 

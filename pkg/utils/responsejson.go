@@ -6,7 +6,7 @@ import (
 
 type SuccessResponse struct {
 	Status  string      `json:"status" example:"success"`
-	Message string      `json:"message" example:"success"`
+	Message string      `json:"message" example:"do something completed"`
 	Data    interface{} `json:"data"`
 }
 

@@ -8,6 +8,9 @@ import (
 	"github.com/p-jirayusakul/go-flat-arch-template/pkg/common"
 	"github.com/p-jirayusakul/go-flat-arch-template/pkg/config"
 	"github.com/p-jirayusakul/go-flat-arch-template/pkg/middleware"
+
+	_ "github.com/p-jirayusakul/go-flat-arch-template/docs"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 type ServerHttpHandler struct {
@@ -28,6 +31,8 @@ func NewHandler(
 
 	// auth
 	var baseAPI = "/api/v1"
+	app.GET(baseAPI+"/docs/*", echoSwagger.WrapHandler)
+
 	authGroup := app.Group(baseAPI + "/auth")
 	authGroup.POST("/register", handler.Register)
 	authGroup.POST("/login", handler.Login)

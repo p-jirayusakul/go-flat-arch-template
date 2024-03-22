@@ -1,0 +1,5 @@
+// Swagger Replace custom type
+replace pgtype.Text string
+replace pgtype.Numeric float64
+replace pgtype.Bool bool
+replace pgtype.Int2 int16

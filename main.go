@@ -19,6 +19,11 @@ var (
 	db  = database.InitDatabase(cfg)
 )
 
+// @title           Flat Architecture
+// @version         1.0
+// @description     This is template flat arch
+
+// @host      localhost:3000
 func main() {
 
 	// plug database
@@ -26,7 +31,6 @@ func main() {
 
 	// plug controller
 	app := echo.New()
-
 	app.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
