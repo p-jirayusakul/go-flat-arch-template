@@ -8,15 +8,15 @@ import (
 	"github.com/labstack/echo/v4"
 	database "github.com/p-jirayusakul/go-flat-arch-template/database/sqlc"
 	"github.com/p-jirayusakul/go-flat-arch-template/handlers"
-	"github.com/p-jirayusakul/go-flat-arch-template/middleware"
-	"github.com/p-jirayusakul/go-flat-arch-template/utils"
+	"github.com/p-jirayusakul/go-flat-arch-template/pkg/config"
+	"github.com/p-jirayusakul/go-flat-arch-template/pkg/middleware"
 )
 
 const PATH_CONFIG = ".env"
 
 var (
-	config = utils.InitConfigs(PATH_CONFIG)
-	db     = database.InitDatabase(config)
+	cfg = config.InitConfigs(PATH_CONFIG)
+	db  = database.InitDatabase(cfg)
 )
 
 func main() {
@@ -40,6 +40,6 @@ func main() {
 	app.Use(middleware.LogHandler(logger))
 
 	// add all plug to handler
-	handlers.NewHandler(app, &config, store)
-	app.Logger.Fatal(app.Start(":" + config.API_PORT))
+	handlers.NewHandler(app, &cfg, store)
+	app.Logger.Fatal(app.Start(":" + cfg.API_PORT))
 }

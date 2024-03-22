@@ -15,8 +15,8 @@ type ErrorResponse struct {
 	Message string `json:"message" example:"something went wrong"`
 }
 
-func RespondWithError(c echo.Context, code int, message string) error {
-	return c.JSON(code, ErrorResponse{Message: message, Status: "error"})
+func RespondWithError(code int, message string) error {
+	return echo.NewHTTPError(code, message)
 }
 
 func RespondWithJSON(c echo.Context, code int, message string, payload interface{}) error {

@@ -7,7 +7,8 @@ import (
 	"github.com/labstack/echo/v4"
 	database "github.com/p-jirayusakul/go-flat-arch-template/database/sqlc"
 	"github.com/p-jirayusakul/go-flat-arch-template/handlers/request"
-	"github.com/p-jirayusakul/go-flat-arch-template/utils"
+	"github.com/p-jirayusakul/go-flat-arch-template/pkg/common"
+	"github.com/p-jirayusakul/go-flat-arch-template/pkg/utils"
 )
 
 func (s *ServerHttpHandler) CreateAddresses(c echo.Context) (err error) {
@@ -16,18 +17,18 @@ func (s *ServerHttpHandler) CreateAddresses(c echo.Context) (err error) {
 	// pare json
 	body := new(request.CreateAddressesRequest)
 	if err := c.Bind(body); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return utils.RespondWithError(http.StatusBadRequest, err.Error())
 	}
 
 	// validate DTO
 	if err = c.Validate(body); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return utils.RespondWithError(http.StatusBadRequest, err.Error())
 	}
 
 	// Logic
 	err = s.GetTokenID(c)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+		return utils.RespondWithError(http.StatusUnauthorized, err.Error())
 	}
 
 	arg := database.CreateAddressesParams{
@@ -41,7 +42,7 @@ func (s *ServerHttpHandler) CreateAddresses(c echo.Context) (err error) {
 
 	_, err = s.store.CreateAddresses(ctx, arg)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
 	}
 
 	// Response
@@ -56,12 +57,12 @@ func (s *ServerHttpHandler) ListAddresses(c echo.Context) (err error) {
 	// Logic
 	err = s.GetTokenID(c)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+		return utils.RespondWithError(http.StatusUnauthorized, err.Error())
 	}
 
 	result, err := s.store.ListAddressesByAccountId(ctx, c.Get("accountsID").(string))
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
 	}
 
 	// Response
@@ -75,18 +76,18 @@ func (s *ServerHttpHandler) UpdateAddresses(c echo.Context) (err error) {
 	// pare json
 	body := new(request.UpdateAddressesRequest)
 	if err := c.Bind(body); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return utils.RespondWithError(http.StatusBadRequest, err.Error())
 	}
 
 	// validate DTO
 	if err = c.Validate(body); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return utils.RespondWithError(http.StatusBadRequest, err.Error())
 	}
 
 	// Logic
 	err = s.GetTokenID(c)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+		return utils.RespondWithError(http.StatusUnauthorized, err.Error())
 	}
 
 	isAlreadyExists, err := s.store.IsAddressesAlreadyExists(ctx, database.IsAddressesAlreadyExistsParams{
@@ -94,11 +95,11 @@ func (s *ServerHttpHandler) UpdateAddresses(c echo.Context) (err error) {
 		AccountsID: c.Get("accountsID").(string),
 	})
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
 	}
 
 	if !isAlreadyExists {
-		return echo.NewHTTPError(http.StatusNotFound, utils.ErrDataNotFound.Error())
+		return utils.RespondWithError(http.StatusNotFound, common.ErrDataNotFound.Error())
 	}
 
 	arg := database.UpdateAddressByIdParams{
@@ -113,7 +114,7 @@ func (s *ServerHttpHandler) UpdateAddresses(c echo.Context) (err error) {
 
 	err = s.store.UpdateAddressById(ctx, arg)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
 	}
 
 	// Response
@@ -128,18 +129,18 @@ func (s *ServerHttpHandler) DeleteAddresses(c echo.Context) (err error) {
 	// pare json
 	body := new(request.DeleteAddressesRequest)
 	if err := c.Bind(body); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return utils.RespondWithError(http.StatusBadRequest, err.Error())
 	}
 
 	// validate DTO
 	if err = c.Validate(body); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return utils.RespondWithError(http.StatusBadRequest, err.Error())
 	}
 
 	// Logic
 	err = s.GetTokenID(c)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+		return utils.RespondWithError(http.StatusUnauthorized, err.Error())
 	}
 
 	isAlreadyExists, err := s.store.IsAddressesAlreadyExists(ctx, database.IsAddressesAlreadyExistsParams{
@@ -148,16 +149,16 @@ func (s *ServerHttpHandler) DeleteAddresses(c echo.Context) (err error) {
 	})
 
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
 	}
 
 	if !isAlreadyExists {
-		return echo.NewHTTPError(http.StatusNotFound, utils.ErrDataNotFound.Error())
+		return utils.RespondWithError(http.StatusNotFound, common.ErrDataNotFound.Error())
 	}
 
 	err = s.store.DeleteAddressesById(ctx, body.ID)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
 	}
 
 	// Response

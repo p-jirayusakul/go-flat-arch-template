@@ -12,9 +12,11 @@ import (
 	database "github.com/p-jirayusakul/go-flat-arch-template/database/sqlc"
 	"github.com/p-jirayusakul/go-flat-arch-template/handlers"
 	"github.com/p-jirayusakul/go-flat-arch-template/handlers/request"
-	"github.com/p-jirayusakul/go-flat-arch-template/middleware"
+	"github.com/p-jirayusakul/go-flat-arch-template/pkg/common"
+	"github.com/p-jirayusakul/go-flat-arch-template/pkg/config"
+	"github.com/p-jirayusakul/go-flat-arch-template/pkg/middleware"
+	"github.com/p-jirayusakul/go-flat-arch-template/pkg/utils"
 	"github.com/p-jirayusakul/go-flat-arch-template/test/mockup"
-	"github.com/p-jirayusakul/go-flat-arch-template/utils"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
@@ -54,7 +56,7 @@ func TestCreateAddress(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
-				require.Equal(t, utils.ReplaceStringError(http.StatusUnauthorized, err.Error()), utils.ErrAccountIsInvalid.Error())
+				require.Equal(t, utils.ReplaceStringError(http.StatusUnauthorized, err.Error()), common.ErrAccountIsInvalid.Error())
 			},
 		},
 		{
@@ -103,7 +105,7 @@ func TestCreateAddress(t *testing.T) {
 		tc := testCases[i]
 
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := utils.InitConfigs(".env")
+			cfg := config.InitConfigs(".env")
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
@@ -165,7 +167,7 @@ func TestListAddresses(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
-				require.Equal(t, utils.ReplaceStringError(http.StatusUnauthorized, err.Error()), utils.ErrAccountIsInvalid.Error())
+				require.Equal(t, utils.ReplaceStringError(http.StatusUnauthorized, err.Error()), common.ErrAccountIsInvalid.Error())
 			},
 		},
 	}
@@ -174,7 +176,7 @@ func TestListAddresses(t *testing.T) {
 		tc := testCases[i]
 
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := utils.InitConfigs(".env")
+			cfg := config.InitConfigs(".env")
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
@@ -245,7 +247,7 @@ func TestUpdateAddresses(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
-				require.Equal(t, utils.ReplaceStringError(http.StatusNotFound, err.Error()), utils.ErrDataNotFound.Error())
+				require.Equal(t, utils.ReplaceStringError(http.StatusNotFound, err.Error()), common.ErrDataNotFound.Error())
 			},
 		},
 		{
@@ -256,7 +258,7 @@ func TestUpdateAddresses(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
-				require.Equal(t, utils.ReplaceStringError(http.StatusUnauthorized, err.Error()), utils.ErrAccountIsInvalid.Error())
+				require.Equal(t, utils.ReplaceStringError(http.StatusUnauthorized, err.Error()), common.ErrAccountIsInvalid.Error())
 			},
 		},
 		{
@@ -305,7 +307,7 @@ func TestUpdateAddresses(t *testing.T) {
 		tc := testCases[i]
 
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := utils.InitConfigs(".env")
+			cfg := config.InitConfigs(".env")
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
@@ -372,7 +374,7 @@ func TestDeleteAddresses(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
-				require.Equal(t, utils.ReplaceStringError(http.StatusNotFound, err.Error()), utils.ErrDataNotFound.Error())
+				require.Equal(t, utils.ReplaceStringError(http.StatusNotFound, err.Error()), common.ErrDataNotFound.Error())
 			},
 		},
 	}
@@ -381,7 +383,7 @@ func TestDeleteAddresses(t *testing.T) {
 		tc := testCases[i]
 
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := utils.InitConfigs(".env")
+			cfg := config.InitConfigs(".env")
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 

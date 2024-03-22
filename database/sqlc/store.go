@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/p-jirayusakul/go-flat-arch-template/utils"
+	"github.com/p-jirayusakul/go-flat-arch-template/pkg/config"
 )
 
 // Store defines all functions to execute db queries and transactions
@@ -28,10 +28,10 @@ func NewStore(connPool *pgxpool.Pool) Store {
 	}
 }
 
-func InitDatabase(config utils.Config) *pgxpool.Pool {
+func InitDatabase(cfg config.Config) *pgxpool.Pool {
 
 	// connect to database
-	source := fmt.Sprintf("user=%s password=%s host=%s port=%d dbname=%s sslmode=disable TimeZone=Asia/Bangkok", config.DATABASE_USER, config.DATABASE_PASSWORD, config.DATABASE_HOST, config.DATABASE_PORT, config.DATABASE_NAME)
+	source := fmt.Sprintf("user=%s password=%s host=%s port=%d dbname=%s sslmode=disable TimeZone=Asia/Bangkok", cfg.DATABASE_USER, cfg.DATABASE_PASSWORD, cfg.DATABASE_HOST, cfg.DATABASE_PORT, cfg.DATABASE_NAME)
 	conn, err := pgxpool.New(context.Background(), source)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)

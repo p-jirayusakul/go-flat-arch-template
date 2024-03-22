@@ -12,9 +12,11 @@ import (
 	database "github.com/p-jirayusakul/go-flat-arch-template/database/sqlc"
 	"github.com/p-jirayusakul/go-flat-arch-template/handlers"
 	"github.com/p-jirayusakul/go-flat-arch-template/handlers/request"
-	"github.com/p-jirayusakul/go-flat-arch-template/middleware"
+	"github.com/p-jirayusakul/go-flat-arch-template/pkg/common"
+	"github.com/p-jirayusakul/go-flat-arch-template/pkg/config"
+	"github.com/p-jirayusakul/go-flat-arch-template/pkg/middleware"
+	"github.com/p-jirayusakul/go-flat-arch-template/pkg/utils"
 	"github.com/p-jirayusakul/go-flat-arch-template/test/mockup"
-	"github.com/p-jirayusakul/go-flat-arch-template/utils"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
@@ -49,7 +51,7 @@ func TestRegister(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
-				require.Equal(t, utils.ReplaceStringError(http.StatusBadRequest, err.Error()), utils.ErrEmailIsAlreadyExists.Error())
+				require.Equal(t, utils.ReplaceStringError(http.StatusBadRequest, err.Error()), common.ErrEmailIsAlreadyExists.Error())
 			},
 		},
 		{
@@ -80,7 +82,7 @@ func TestRegister(t *testing.T) {
 		tc := testCases[i]
 
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := utils.InitConfigs(".env")
+			cfg := config.InitConfigs(".env")
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
@@ -138,7 +140,7 @@ func TestLogin(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
-				require.Equal(t, utils.ReplaceStringError(http.StatusUnauthorized, err.Error()), utils.ErrLoginFail.Error())
+				require.Equal(t, utils.ReplaceStringError(http.StatusUnauthorized, err.Error()), common.ErrLoginFail.Error())
 			},
 		},
 		{
@@ -153,7 +155,7 @@ func TestLogin(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
-				require.Equal(t, utils.ReplaceStringError(http.StatusUnauthorized, err.Error()), utils.ErrLoginFail.Error())
+				require.Equal(t, utils.ReplaceStringError(http.StatusUnauthorized, err.Error()), common.ErrLoginFail.Error())
 			},
 		},
 		{
@@ -172,7 +174,7 @@ func TestLogin(t *testing.T) {
 		tc := testCases[i]
 
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := utils.InitConfigs(".env")
+			cfg := config.InitConfigs(".env")
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 

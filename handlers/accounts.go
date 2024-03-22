@@ -10,8 +10,9 @@ import (
 	database "github.com/p-jirayusakul/go-flat-arch-template/database/sqlc"
 	"github.com/p-jirayusakul/go-flat-arch-template/handlers/request"
 	"github.com/p-jirayusakul/go-flat-arch-template/handlers/response"
-	"github.com/p-jirayusakul/go-flat-arch-template/middleware"
-	"github.com/p-jirayusakul/go-flat-arch-template/utils"
+	"github.com/p-jirayusakul/go-flat-arch-template/pkg/common"
+	"github.com/p-jirayusakul/go-flat-arch-template/pkg/middleware"
+	"github.com/p-jirayusakul/go-flat-arch-template/pkg/utils"
 )
 
 func (s *ServerHttpHandler) Register(c echo.Context) (err error) {
@@ -20,27 +21,27 @@ func (s *ServerHttpHandler) Register(c echo.Context) (err error) {
 	// pare json
 	body := new(request.RegisterRequest)
 	if err := c.Bind(body); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return utils.RespondWithError(http.StatusBadRequest, err.Error())
 	}
 
 	// validate DTO
 	if err = c.Validate(body); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return utils.RespondWithError(http.StatusBadRequest, err.Error())
 	}
 
 	// Logic
 	isEmailAlready, err := s.store.IsEmailAlreadyExists(ctx, body.Email)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
 	}
 
 	if isEmailAlready {
-		return echo.NewHTTPError(http.StatusBadRequest, utils.ErrEmailIsAlreadyExists.Error())
+		return utils.RespondWithError(http.StatusBadRequest, common.ErrEmailIsAlreadyExists.Error())
 	}
 
 	hashedPassword, err := utils.HashPassword(body.Password)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
 	}
 
 	params := database.CreateAccountParams{
@@ -51,7 +52,7 @@ func (s *ServerHttpHandler) Register(c echo.Context) (err error) {
 	// Save to Repository
 	_, err = s.store.CreateAccount(ctx, params)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
 	}
 
 	// Response
@@ -66,26 +67,26 @@ func (s *ServerHttpHandler) Login(c echo.Context) (err error) {
 	// pare json
 	body := new(request.LoginRequest)
 	if err := c.Bind(body); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return utils.RespondWithError(http.StatusBadRequest, err.Error())
 	}
 
 	// validate DTO
 	if err = c.Validate(body); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return utils.RespondWithError(http.StatusBadRequest, err.Error())
 	}
 
 	// Logic
 	account, err := s.store.GetAccountByEmail(ctx, body.Email)
 	if err != nil {
-		if errors.Is(err, utils.ErrDBNoRows) {
-			return echo.NewHTTPError(http.StatusUnauthorized, utils.ErrLoginFail.Error())
+		if errors.Is(err, common.ErrDBNoRows) {
+			return utils.RespondWithError(http.StatusUnauthorized, common.ErrLoginFail.Error())
 		}
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
 	}
 
 	err = utils.CheckPassword(body.Password, account.Password)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusUnauthorized, utils.ErrLoginFail.Error())
+		return utils.RespondWithError(http.StatusUnauthorized, common.ErrLoginFail.Error())
 	}
 
 	token, err := middleware.CreateToken(middleware.CreateTokenDTO{
@@ -94,7 +95,7 @@ func (s *ServerHttpHandler) Login(c echo.Context) (err error) {
 		ExpiresAt: time.Now().Add(time.Hour * 72),
 	})
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
 	}
 
 	// Response

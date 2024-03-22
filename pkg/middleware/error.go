@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/p-jirayusakul/go-flat-arch-template/utils"
+	"github.com/p-jirayusakul/go-flat-arch-template/pkg/utils"
 )
 
 func ErrorHandler(next echo.HandlerFunc) echo.HandlerFunc {
@@ -14,9 +14,9 @@ func ErrorHandler(next echo.HandlerFunc) echo.HandlerFunc {
 			// Handle errors here
 			switch e := err.(type) {
 			case *echo.HTTPError:
-				return utils.RespondWithError(c, e.Code, e.Message.(string))
+				return c.JSON(e.Code, utils.ErrorResponse{Message: e.Message.(string), Status: "error"})
 			default:
-				return utils.RespondWithError(c, http.StatusInternalServerError, "Internal Server Error")
+				return c.JSON(http.StatusInternalServerError, utils.ErrorResponse{Message: "Internal Server Error", Status: "error"})
 			}
 		}
 		return nil
