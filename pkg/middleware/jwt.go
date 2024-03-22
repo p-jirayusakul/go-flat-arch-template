@@ -9,7 +9,7 @@ import (
 )
 
 type jwtCustomClaims struct {
-	UID string `json:"uid"`
+	ID string `json:"id"`
 	jwt.RegisteredClaims
 }
 
@@ -26,8 +26,7 @@ func ConfigJWT(secret string) echo.MiddlewareFunc {
 		},
 		SigningKey: []byte(secret),
 		SuccessHandler: func(c echo.Context) {
-			accountsID := DecodeToken(c)
-			c.Set("accountsID", accountsID)
+			c.Set("accountsID", decodeToken(c))
 		},
 	}
 
@@ -36,7 +35,7 @@ func ConfigJWT(secret string) echo.MiddlewareFunc {
 
 func CreateToken(param CreateTokenDTO) (token string, err error) {
 	claims := &jwtCustomClaims{
-		UID: param.UserID,
+		ID: param.UserID,
 	}
 	claims.ExpiresAt = jwt.NewNumericDate(param.ExpiresAt)
 
@@ -52,10 +51,10 @@ func CreateToken(param CreateTokenDTO) (token string, err error) {
 	return
 }
 
-func DecodeToken(c echo.Context) (id string) {
+func decodeToken(c echo.Context) (id string) {
 	user := c.Get("user").(*jwt.Token)
 	claims := user.Claims.(*jwtCustomClaims)
-	id = claims.UID
+	id = claims.ID
 
 	return
 }
