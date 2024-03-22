@@ -5,6 +5,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	database "github.com/p-jirayusakul/go-flat-arch-template/database/sqlc"
+	"github.com/p-jirayusakul/go-flat-arch-template/external"
 	"github.com/p-jirayusakul/go-flat-arch-template/pkg/common"
 	"github.com/p-jirayusakul/go-flat-arch-template/pkg/config"
 	"github.com/p-jirayusakul/go-flat-arch-template/pkg/middleware"
@@ -16,17 +17,20 @@ import (
 type ServerHttpHandler struct {
 	cfg   *config.Config
 	store database.Store
+	exApi external.ExternalAPI
 }
 
 func NewHandler(
 	app *echo.Echo,
 	cfg *config.Config,
 	store database.Store,
+	exApi external.ExternalAPI,
 ) *ServerHttpHandler {
 
 	handler := &ServerHttpHandler{
 		cfg:   cfg,
 		store: store,
+		exApi: exApi,
 	}
 
 	// auth

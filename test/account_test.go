@@ -28,15 +28,16 @@ func TestRegister(t *testing.T) {
 	testCases := []struct {
 		name          string
 		body          string
-		buildStubs    func(store *mockup.MockStore, body request.RegisterRequest)
+		buildStubs    func(store *mockup.MockStore, exApi *mockup.MockExternalAPI, body request.RegisterRequest)
 		checkResponse func(t *testing.T, status int, err error)
 	}{
 		{
 			name: "OK",
 			body: `{"email":"test@email.com","password":"123456"}`,
-			buildStubs: func(store *mockup.MockStore, body request.RegisterRequest) {
+			buildStubs: func(store *mockup.MockStore, exApi *mockup.MockExternalAPI, body request.RegisterRequest) {
 				store.EXPECT().IsEmailAlreadyExists(gomock.Any(), body.Email).Times(1).Return(false, nil)
 				store.EXPECT().CreateAccount(gomock.Any(), gomock.Any()).Times(1).Return(uid, nil)
+				exApi.EXPECT().GetPosts().Times(1).Return("", nil)
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.NoError(t, err)
@@ -46,7 +47,7 @@ func TestRegister(t *testing.T) {
 		{
 			name: "Bad Request - this email is already used",
 			body: `{"email":"test@email.com","password":"123456"}`,
-			buildStubs: func(store *mockup.MockStore, body request.RegisterRequest) {
+			buildStubs: func(store *mockup.MockStore, exApi *mockup.MockExternalAPI, body request.RegisterRequest) {
 				store.EXPECT().IsEmailAlreadyExists(gomock.Any(), body.Email).Times(1).Return(true, nil)
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
@@ -57,7 +58,7 @@ func TestRegister(t *testing.T) {
 		{
 			name: "Bad Request - email invalid format",
 			body: `{"email":"testemail.com","password":"123456"}`,
-			buildStubs: func(store *mockup.MockStore, body request.RegisterRequest) {
+			buildStubs: func(store *mockup.MockStore, exApi *mockup.MockExternalAPI, body request.RegisterRequest) {
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
@@ -67,7 +68,7 @@ func TestRegister(t *testing.T) {
 		{
 			name: "Internal Server Error",
 			body: `{"email":"test@email.com","password":"123456"}`,
-			buildStubs: func(store *mockup.MockStore, body request.RegisterRequest) {
+			buildStubs: func(store *mockup.MockStore, exApi *mockup.MockExternalAPI, body request.RegisterRequest) {
 				store.EXPECT().IsEmailAlreadyExists(gomock.Any(), body.Email).Times(1).Return(false, nil)
 				store.EXPECT().CreateAccount(gomock.Any(), gomock.Any()).Times(1).Return("", pgx.ErrTxClosed)
 			},
@@ -87,10 +88,12 @@ func TestRegister(t *testing.T) {
 			defer ctrl.Finish()
 
 			store := mockup.NewMockStore(ctrl)
+			exApi := mockup.NewMockExternalAPI(ctrl)
+
 			var dto request.RegisterRequest
 			err := json.Unmarshal([]byte(tc.body), &dto)
 			require.NoError(t, err)
-			tc.buildStubs(store, dto)
+			tc.buildStubs(store, exApi, dto)
 
 			app := echo.New()
 			app.Validator = middleware.NewCustomValidator()
@@ -100,7 +103,7 @@ func TestRegister(t *testing.T) {
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			c := app.NewContext(req, rec)
-			handler := handlers.NewHandler(app, &cfg, store)
+			handler := handlers.NewHandler(app, &cfg, store, exApi)
 
 			err = handler.Register(c)
 			tc.checkResponse(t, c.Response().Status, err)
@@ -179,6 +182,8 @@ func TestLogin(t *testing.T) {
 			defer ctrl.Finish()
 
 			store := mockup.NewMockStore(ctrl)
+			exApi := mockup.NewMockExternalAPI(ctrl)
+
 			var dto request.LoginRequest
 			err := json.Unmarshal([]byte(tc.body), &dto)
 			require.NoError(t, err)
@@ -192,7 +197,7 @@ func TestLogin(t *testing.T) {
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			c := app.NewContext(req, rec)
-			handler := handlers.NewHandler(app, &cfg, store)
+			handler := handlers.NewHandler(app, &cfg, store, exApi)
 
 			err = handler.Login(c)
 			tc.checkResponse(t, c.Response().Status, err)

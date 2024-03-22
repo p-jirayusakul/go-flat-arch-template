@@ -110,6 +110,8 @@ func TestCreateAddress(t *testing.T) {
 			defer ctrl.Finish()
 
 			store := mockup.NewMockStore(ctrl)
+			exApi := mockup.NewMockExternalAPI(ctrl)
+
 			var dto request.CreateAddressesRequest
 			err := json.Unmarshal([]byte(tc.body), &dto)
 			require.NoError(t, err)
@@ -125,7 +127,7 @@ func TestCreateAddress(t *testing.T) {
 			rec := httptest.NewRecorder()
 			c := app.NewContext(req, rec)
 			c.Set("accountsID", uid)
-			handler := handlers.NewHandler(app, &cfg, store)
+			handler := handlers.NewHandler(app, &cfg, store, exApi)
 
 			err = handler.CreateAddresses(c)
 			tc.checkResponse(t, c.Response().Status, err)
@@ -181,6 +183,8 @@ func TestListAddresses(t *testing.T) {
 			defer ctrl.Finish()
 
 			store := mockup.NewMockStore(ctrl)
+			exApi := mockup.NewMockExternalAPI(ctrl)
+
 			tc.buildStubs(store)
 
 			app := echo.New()
@@ -193,7 +197,7 @@ func TestListAddresses(t *testing.T) {
 			rec := httptest.NewRecorder()
 			c := app.NewContext(req, rec)
 			c.Set("accountsID", uid)
-			handler := handlers.NewHandler(app, &cfg, store)
+			handler := handlers.NewHandler(app, &cfg, store, exApi)
 
 			err := handler.ListAddresses(c)
 			tc.checkResponse(t, c.Response().Status, err)
@@ -312,6 +316,8 @@ func TestUpdateAddresses(t *testing.T) {
 			defer ctrl.Finish()
 
 			store := mockup.NewMockStore(ctrl)
+			exApi := mockup.NewMockExternalAPI(ctrl)
+
 			var dto request.UpdateAddressesRequest
 			err := json.Unmarshal([]byte(tc.body), &dto)
 			require.NoError(t, err)
@@ -331,7 +337,7 @@ func TestUpdateAddresses(t *testing.T) {
 			c.SetParamNames("id")
 			c.SetParamValues(addressesID)
 
-			handler := handlers.NewHandler(app, &cfg, store)
+			handler := handlers.NewHandler(app, &cfg, store, exApi)
 
 			err = handler.UpdateAddresses(c)
 			tc.checkResponse(t, c.Response().Status, err)
@@ -388,6 +394,8 @@ func TestDeleteAddresses(t *testing.T) {
 			defer ctrl.Finish()
 
 			store := mockup.NewMockStore(ctrl)
+			exApi := mockup.NewMockExternalAPI(ctrl)
+
 			tc.buildStubs(store)
 
 			app := echo.New()
@@ -404,7 +412,7 @@ func TestDeleteAddresses(t *testing.T) {
 			c.SetParamNames("id")
 			c.SetParamValues(addressesID)
 
-			handler := handlers.NewHandler(app, &cfg, store)
+			handler := handlers.NewHandler(app, &cfg, store, exApi)
 
 			err := handler.DeleteAddresses(c)
 			tc.checkResponse(t, c.Response().Status, err)

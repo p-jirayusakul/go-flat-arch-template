@@ -7,6 +7,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	database "github.com/p-jirayusakul/go-flat-arch-template/database/sqlc"
+	"github.com/p-jirayusakul/go-flat-arch-template/external"
 	"github.com/p-jirayusakul/go-flat-arch-template/handlers"
 	"github.com/p-jirayusakul/go-flat-arch-template/pkg/config"
 	"github.com/p-jirayusakul/go-flat-arch-template/pkg/middleware"
@@ -31,6 +32,9 @@ var (
 // @host      localhost:3000
 func main() {
 
+	// plug external APIs
+	exApi := external.New(&cfg)
+
 	// plug database
 	store := database.NewStore(db)
 
@@ -49,6 +53,6 @@ func main() {
 	app.Use(middleware.LogHandler(logger))
 
 	// add all plug to handler
-	handlers.NewHandler(app, &cfg, store)
+	handlers.NewHandler(app, &cfg, store, exApi)
 	app.Logger.Fatal(app.Start(":" + cfg.API_PORT))
 }

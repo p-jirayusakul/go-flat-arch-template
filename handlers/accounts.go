@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -66,6 +67,14 @@ func (s *ServerHttpHandler) Register(c echo.Context) (err error) {
 	if err != nil {
 		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
 	}
+
+	// Test Call APIs External Project
+	resultAPIs, err := s.exApi.GetPosts()
+	if err != nil {
+		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
+	}
+
+	fmt.Println("resultAPIs", resultAPIs)
 
 	// Response
 	var payload interface{}
