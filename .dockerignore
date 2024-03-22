@@ -1,0 +1,12 @@
+# compiled output
+main
+
+#env
+.env
+.env.dev
+.env.local
+.env.uat
+.env.production
+
+# OS
+.DS_Store
