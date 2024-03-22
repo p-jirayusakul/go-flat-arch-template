@@ -52,6 +52,7 @@
     API_PORT=3000
     JWT_SECRET=XyvnrmjDFkCLaUwYZ0zyiPapYSdyVMD8
     SECRET=3nSSLymRXuUnDNXzM50BCaSKgjbcKAK8
+	EXTERNAL_API_URL=https://jsonplaceholder.typicode.com
 	```
 
 - Run server:
