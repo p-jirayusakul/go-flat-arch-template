@@ -23,6 +23,7 @@ import (
 // @Failure      404  {object}  utils.ErrorResponse
 // @Failure      500  {object}  utils.ErrorResponse
 // @Router       /api/v1/profile/addresses [post]
+// @Security Bearer
 func (s *ServerHttpHandler) CreateAddresses(c echo.Context) (err error) {
 	ctx := context.Background()
 
@@ -74,6 +75,7 @@ func (s *ServerHttpHandler) CreateAddresses(c echo.Context) (err error) {
 // @Failure      404  {object}  utils.ErrorResponse
 // @Failure      500  {object}  utils.ErrorResponse
 // @Router       /api/v1/profile/addresses [get]
+// @Security Bearer
 func (s *ServerHttpHandler) ListAddresses(c echo.Context) (err error) {
 	ctx := context.Background()
 
@@ -106,6 +108,7 @@ func (s *ServerHttpHandler) ListAddresses(c echo.Context) (err error) {
 // @Failure      404  {object}  utils.ErrorResponse
 // @Failure      500  {object}  utils.ErrorResponse
 // @Router       /api/v1/profile/addresses/{address_id} [put]
+// @Security Bearer
 func (s *ServerHttpHandler) UpdateAddresses(c echo.Context) (err error) {
 	ctx := context.Background()
 
@@ -171,6 +174,7 @@ func (s *ServerHttpHandler) UpdateAddresses(c echo.Context) (err error) {
 // @Failure      404  {object}  utils.ErrorResponse
 // @Failure      500  {object}  utils.ErrorResponse
 // @Router       /api/v1/profile/addresses/{address_id} [delete]
+// @Security Bearer
 func (s *ServerHttpHandler) DeleteAddresses(c echo.Context) (err error) {
 	ctx := context.Background()
 

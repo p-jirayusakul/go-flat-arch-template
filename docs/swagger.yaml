@@ -204,6 +204,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
+      security:
+      - Bearer: []
       summary: Get List Address
       tags:
       - profile
@@ -237,6 +239,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
+      security:
+      - Bearer: []
       summary: Create Address
       tags:
       - profile
@@ -268,6 +272,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
+      security:
+      - Bearer: []
       summary: Delete Address By Address Id
       tags:
       - profile
@@ -306,7 +312,15 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
+      security:
+      - Bearer: []
       summary: Update Address
       tags:
       - profile
+securityDefinitions:
+  Bearer:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

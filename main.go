@@ -23,6 +23,11 @@ var (
 // @version         1.0
 // @description     This is template flat arch
 
+// @securityDefinitions.apikey Bearer
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
+
 // @host      localhost:3000
 func main() {
 

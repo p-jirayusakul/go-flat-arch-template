@@ -133,6 +133,11 @@ const docTemplate = `{
         },
         "/api/v1/profile/addresses": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "list address",
                 "consumes": [
                     "application/json"
@@ -172,6 +177,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "register",
                 "consumes": [
                     "application/json"
@@ -224,6 +234,11 @@ const docTemplate = `{
         },
         "/api/v1/profile/addresses/{address_id}": {
             "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "update address",
                 "consumes": [
                     "application/json"
@@ -281,6 +296,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Delete Address",
                 "consumes": [
                     "application/json"
@@ -463,6 +483,14 @@ const docTemplate = `{
                     "example": "success"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "description": "Type \"Bearer\" followed by a space and JWT token.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`
