@@ -53,7 +53,7 @@ func (s *ServerHttpHandler) CreateAddresses(c echo.Context) (err error) {
 		AccountsID:    c.Get("accountsID").(string),
 	}
 
-	_, err = s.store.CreateAddresses(ctx, arg)
+	_, err = s.store.CreateAddresses(ctx, &arg)
 	if err != nil {
 		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
 	}
@@ -129,7 +129,7 @@ func (s *ServerHttpHandler) UpdateAddresses(c echo.Context) (err error) {
 		return utils.RespondWithError(http.StatusUnauthorized, err.Error())
 	}
 
-	isAlreadyExists, err := s.store.IsAddressesAlreadyExists(ctx, database.IsAddressesAlreadyExistsParams{
+	isAlreadyExists, err := s.store.IsAddressesAlreadyExists(ctx, &database.IsAddressesAlreadyExistsParams{
 		ID:         body.ID,
 		AccountsID: c.Get("accountsID").(string),
 	})
@@ -151,7 +151,7 @@ func (s *ServerHttpHandler) UpdateAddresses(c echo.Context) (err error) {
 		AccountsID:    c.Get("accountsID").(string),
 	}
 
-	err = s.store.UpdateAddressById(ctx, arg)
+	err = s.store.UpdateAddressById(ctx, &arg)
 	if err != nil {
 		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
 	}
@@ -195,7 +195,7 @@ func (s *ServerHttpHandler) DeleteAddresses(c echo.Context) (err error) {
 		return utils.RespondWithError(http.StatusUnauthorized, err.Error())
 	}
 
-	isAlreadyExists, err := s.store.IsAddressesAlreadyExists(ctx, database.IsAddressesAlreadyExistsParams{
+	isAlreadyExists, err := s.store.IsAddressesAlreadyExists(ctx, &database.IsAddressesAlreadyExistsParams{
 		ID:         body.ID,
 		AccountsID: c.Get("accountsID").(string),
 	})

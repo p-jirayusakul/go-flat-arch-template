@@ -64,7 +64,7 @@ func (s *ServerHttpHandler) Register(c echo.Context) (err error) {
 	}
 
 	// Save to Repository
-	_, err = s.store.CreateAccount(ctx, params)
+	_, err = s.store.CreateAccount(ctx, &params)
 	if err != nil {
 		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
 	}
