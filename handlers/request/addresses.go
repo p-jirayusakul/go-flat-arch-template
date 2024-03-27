@@ -20,3 +20,15 @@ type UpdateAddressesRequest struct {
 type DeleteAddressesRequest struct {
 	ID string `param:"id" validate:"uuid4,required"`
 }
+
+type SearchAddressesRequest struct {
+	PageNumber int    `query:"pageNumber"`
+	PageSize   int    `query:"pageSize"`
+	City       string `query:"city"`
+	Province   string `query:"province"`
+	PostalCode string `query:"postalCode"`
+	Country    string `query:"country"`
+	AccountsID string `query:"accountsID"`
+	OrderBy    string `query:"orderBy"`
+	OrderType  string `query:"orderType" validate:"omitempty,oneof=desc asc"`
+}

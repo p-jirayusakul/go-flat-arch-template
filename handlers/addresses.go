@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"math"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -74,7 +75,7 @@ func (s *ServerHttpHandler) CreateAddresses(c echo.Context) (err error) {
 // @Failure      400  {object}  utils.ErrorResponse
 // @Failure      404  {object}  utils.ErrorResponse
 // @Failure      500  {object}  utils.ErrorResponse
-// @Router       /api/v1/profile/addresses [get]
+// @Router       /api/v1/profile/addresses/me [get]
 // @Security Bearer
 func (s *ServerHttpHandler) ListAddresses(c echo.Context) (err error) {
 	ctx := context.Background()
@@ -89,6 +90,94 @@ func (s *ServerHttpHandler) ListAddresses(c echo.Context) (err error) {
 	if err != nil {
 		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
 	}
+
+	// Response
+	message := "get addresses completed"
+	return utils.RespondWithJSON(c, http.StatusOK, message, result)
+}
+
+// Address
+// @Summary      Get List Address
+// @Description  list address
+// @Tags         profile
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  utils.SuccessResponse
+// @Failure      400  {object}  utils.ErrorResponse
+// @Failure      404  {object}  utils.ErrorResponse
+// @Failure      500  {object}  utils.ErrorResponse
+// @Router       /api/v1/profile/addresses [get]
+// @Security Bearer
+func (s *ServerHttpHandler) SearchAddresses(c echo.Context) (err error) {
+	ctx := context.Background()
+
+	// pare json
+	body := new(request.SearchAddressesRequest)
+	if err := c.Bind(body); err != nil {
+		return utils.RespondWithError(http.StatusBadRequest, err.Error())
+	}
+
+	// validate DTO
+	if err = c.Validate(body); err != nil {
+		return utils.RespondWithError(http.StatusBadRequest, err.Error())
+	}
+
+	// Logic
+	err = s.GetTokenID(c)
+	if err != nil {
+		return utils.RespondWithError(http.StatusUnauthorized, err.Error())
+	}
+
+	pageNumber := body.PageNumber
+	pageSize := body.PageSize
+
+	if body.PageSize == 0 {
+		pageSize = common.PAGE_SIZE
+	}
+
+	if pageSize > common.MAX_PAGE_SIZE {
+		pageSize = common.MAX_PAGE_SIZE
+	}
+
+	if pageNumber > 0 {
+		pageNumber = (pageNumber - 1) * pageSize
+	}
+
+	arg := database.SearchAddressesParams{
+		PageNumber:    pageNumber,
+		PageSize:      pageSize,
+		City:          body.City,
+		StateProvince: body.Province,
+		PostalCode:    body.PostalCode,
+		Country:       body.Country,
+		AccountsID:    body.AccountsID,
+		OrderBy:       body.OrderBy,
+		OrderType:     body.OrderType,
+	}
+
+	result, err := s.store.SearchAddresses(ctx, arg)
+	if err != nil {
+		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
+	}
+
+	var totalPages int
+	if len(result.Data) > 0 {
+		result.TotalItems = int(result.TotalItems)
+		totalPages = int(math.Ceil(float64(result.TotalItems) / float64(pageSize)))
+	} else {
+		result.TotalItems = 0
+		totalPages = 0
+	}
+
+	if body.PageNumber == 0 {
+		pageNumber = 1
+	} else {
+		pageNumber = body.PageNumber
+	}
+
+	result.PageNumber = pageNumber
+	result.PageSize = pageSize
+	result.TotalPages = totalPages
 
 	// Response
 	message := "get addresses completed"
